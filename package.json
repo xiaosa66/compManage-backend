@@ -1,0 +1,38 @@
+{
+  "name": "copmManage",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "node bin/www",
+    "dev": "./node_modules/.bin/nodemon bin/www",
+    "gittest": "./node_modules/.bin/nodemon index.js",
+    "prd": "pm2 start bin/www",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "debug": "^2.6.3",
+    "koa-convert": "^1.2.0",
+    "pug": "^2.0.0-rc.1"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "ejs": "^2.6.1",
+    "koa": "^2.7.0",
+    "koa-bodyparser": "^3.2.0",
+    "koa-json": "^2.0.2",
+    "koa-logger": "^2.0.1",
+    "koa-mysql-session": "0.0.2",
+    "koa-onerror": "^1.3.1",
+    "koa-router": "^7.4.0",
+    "koa-session-minimal": "^3.0.4",
+    "koa-static": "^3.0.0",
+    "koa-static-cache": "^5.1.2",
+    "koa-views": "^5.2.1",
+    "markdown-it": "^8.4.2",
+    "md5": "^2.2.1",
+    "mocha": "^6.0.2",
+    "moment": "^2.24.0",
+    "mysql": "^2.16.0",
+    "nodemon": "^1.8.1"
+  }
+}
