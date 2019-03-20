@@ -4,11 +4,9 @@
 const Koa=require('koa');
 const path=require('path')
 const bodyParser = require('koa-bodyparser');
-const ejs=require('ejs');
 const session = require('koa-session-minimal');
 const MysqlStore = require('koa-mysql-session');
 const config = require('./config/default.js');
-const router=require('koa-router')
 const views = require('koa-views')
 const koaStatic = require('koa-static')
 const staticCache = require('koa-static-cache')
@@ -67,8 +65,8 @@ app.use(bodyParser({
 app.use(require('./routes/signin.js').routes())
 app.use(require('./routes/signup.js').routes())
 app.use(require('./routes/posts.js').routes())
-app.use(require('./routes/signout.js').routes()) 
-app.use(require('./routes/users.js').routes()) 
+app.use(require('./routes/signout.js').routes())
+app.use(require('./routes/admin.js').routes())
 
 
 app.listen(3000)
