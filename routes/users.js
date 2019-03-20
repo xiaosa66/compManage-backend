@@ -7,7 +7,7 @@ const { checkNotLogin } = require('../middlewares/check.js');
 
 
 //获取用户数量接口
-router.get('user/count', async(ctx, next) => {
+router.get('/user/count', async(ctx, next) => {
     await userModel.findAllUserCount() 
         .then(result => {
             if (result) {
