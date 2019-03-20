@@ -10,9 +10,22 @@ const MysqlStore = require('koa-mysql-session');
 const config = require('./config/default.js');
 const router=require('koa-router')
 const views = require('koa-views')
-// const koaStatic = require('koa-static')
+const koaStatic = require('koa-static')
 const staticCache = require('koa-static-cache')
-const app = new Koa()
+const app = new Koa();
+
+
+
+
+// 跨域操作
+const cors = require('@koa/cors');
+
+app.use(cors({
+  origin: 'http://localhost:8002', // 前端站点的host
+  allowedHeaders: 'Origin, x-requested-with, Content-Type, X-Token', //X-Token为自定义的头字段
+  credentials: true //设置成true 请求中才会带上cookie信息，否则请求失败
+}));
+
 
 
 // session存储配置
@@ -31,9 +44,10 @@ app.use(session({
 
 
 // 配置静态资源加载中间件
-// app.use(koaStatic(
-//   path.join(__dirname , './public')
-// ))
+app.use(koaStatic(
+  path.join(__dirname , './public')
+))
+
 // 缓存
 app.use(staticCache(path.join(__dirname, './public'), { dynamic: true }, {
   maxAge: 365 * 24 * 60 * 60
@@ -50,11 +64,11 @@ app.use(bodyParser({
   formLimit: '1mb'
 }))
 
-//  路由(我们先注释三个，等后面添加好了再取消注释，因为我们还没有定义路由，稍后会先实现注册)
-//app.use(require('./routers/signin.js').routes())
+app.use(require('./routes/signin.js').routes())
 app.use(require('./routes/signup.js').routes())
-//app.use(require('./routers/posts.js').routes())
-//app.use(require('./routers/signout.js').routes())
+app.use(require('./routes/posts.js').routes())
+app.use(require('./routes/signout.js').routes()) 
+app.use(require('./routes/users.js').routes()) 
 
 
 app.listen(3000)

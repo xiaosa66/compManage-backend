@@ -4,12 +4,13 @@
   "private": true,
   "scripts": {
     "start": "node bin/www",
-    "dev": "./node_modules/.bin/nodemon bin/www",
-    "gittest": "./node_modules/.bin/nodemon index.js",
+    "gittest": "./node_modules/.bin/nodemon bin/www",
+    "dev": "./node_modules/.bin/nodemon index.js",
     "prd": "pm2 start bin/www",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "@koa/cors": "^2.2.3",
     "debug": "^2.6.3",
     "koa-convert": "^1.2.0",
     "pug": "^2.0.0-rc.1"
