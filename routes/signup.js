@@ -5,6 +5,7 @@ const checkNotLogin = require('../middlewares/check.js').checkNotLogin
 const checkLogin = require('../middlewares/check.js').checkLogin
 const moment = require('moment');
 const fs = require('fs')
+const experts = require('../controller/c-expert.js');
 // 注册页面
 router.get('/signup', async(ctx, next) => {
     await checkNotLogin(ctx)
@@ -12,7 +13,7 @@ router.get('/signup', async(ctx, next) => {
         session: ctx.session,
     })
 })
-// post 注册
+// post 管理员注册
 router.post('/signup', async(ctx, next) => {
     //console.log(ctx.request.body)
     let user = {
@@ -59,6 +60,36 @@ router.post('/signup', async(ctx, next) => {
                             message:'注册成功'
                         };
                     })
+            }
+        })
+})
+// post 专家注册
+router.post('/expSignup', async(ctx, next) => {
+    let { expert_name,password,repeatpass,expert_class,expert_info,province_ID } = ctx.request.body
+    await userModel.findExpertCountByName(expert_name)
+        .then(async (result) => {
+            console.log(result)
+            if (result[0].count >= 1) {
+                // 用户存在
+                ctx.body = {
+                    code: 500,
+                    message: '用户存在'
+                };
+            } else if (password !== repeatpass || password.trim() === '') {
+                ctx.body = {
+                    code: 500,
+                    message: '两次输入的密码不一致'
+                };
+            } else {
+                    await userModel.insertExpert([expert_name, md5(password),expert_class ,expert_info, province_ID,moment().format('YYYY-MM-DD HH:mm:ss')])
+                        .then(res => {
+                            console.log('注册成功', res)
+                            //注册成功
+                            ctx.body = {
+                                code: 200,
+                                message: '注册成功'
+                            };
+                        })
             }
         })
 })
