@@ -15,15 +15,16 @@ router.get('/signup', async (ctx, next) => {
 // post 管理员注册
 router.post('/signup', async (ctx, next) => {
     //console.log(ctx.request.body)
-    let user = {
-        name: ctx.request.body.name,
-        pass: ctx.request.body.password,
-        repeatpass: ctx.request.body.repeatpass,
-        avator: ctx.request.body.avator
+    let user = ctx.request.body;
+    if(!user){
+        ctx.body = {
+            code: 500,
+            message:'请输入参数'
+        };
     }
     await userModel.findDataByName(user.name)
         .then(async (result) => {
-            console.log('findDataByName:', result)
+
             if (result.length) {
                 try {
                     throw Error('用户已经存在')
@@ -67,7 +68,12 @@ router.post('/expSignup', async (ctx, next) => {
     let { expert_name, password, repeatpass, expert_class, expert_info, province_ID } = ctx.request.body
     await userModel.findExpertCountByName(expert_name)
         .then(async (result) => {
-            console.log(result)
+            if(!result){
+                ctx.body = {
+                    code: 500,
+                    message:'请输入参数'
+                };
+            }
             if (result[0].count >= 1) {
                 // 用户存在
                 ctx.body = {
@@ -97,6 +103,12 @@ router.post('/createSchool', async (ctx, next) => {
     let { school_name, city_ID } = ctx.request.body
     await userModel.schoolExist(school_name)
         .then(async (result) => {
+            if(!result){
+                ctx.body = {
+                    code: 500,
+                    message:'请输入参数'
+                };
+            }
             if (result[0].count >= 1) {
                 // 用户存在
                 ctx.body = {
@@ -116,6 +128,7 @@ router.post('/createSchool', async (ctx, next) => {
         })
 })
 
+// 获取省份列表
 router.get('/getProvince', async (ctx, next) => {
     // await checkNotLogin(ctx)
     await userModel.returnProvinceList()
@@ -126,7 +139,7 @@ router.get('/getProvince', async (ctx, next) => {
             };
         })
 })
-
+// 根据 province_id 获取 citylist
 router.get('/getCityList', async (ctx, next) => {
     // await checkNotLogin(ctx)
     let { province_ID } = ctx.query;
