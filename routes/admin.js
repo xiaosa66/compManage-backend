@@ -4,9 +4,6 @@ const userModel = require('../lib/mysql.js')
 const md5 = require('md5')
 const { checkNotLogin } = require('../middlewares/check.js');
 
-
-
-
 //获取管理员列表接口
 router.get('/admin/info', async(ctx, next) => {
     await userModel.findAllAdmin()

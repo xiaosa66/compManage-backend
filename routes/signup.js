@@ -16,10 +16,10 @@ router.get('/signup', async (ctx, next) => {
 router.post('/signup', async (ctx, next) => {
     //console.log(ctx.request.body)
     let user = ctx.request.body;
-    if(!user){
+    if (!user) {
         ctx.body = {
-            code: 500,
-            message:'请输入参数'
+            code: -1,
+            message: '请输入参数'
         };
     }
     await userModel.findDataByName(user.name)
@@ -65,24 +65,25 @@ router.post('/signup', async (ctx, next) => {
 })
 // post 专家注册
 router.post('/expSignup', async (ctx, next) => {
-    let { expert_name, password, repeatpass, expert_class, expert_info, province_ID } = ctx.request.body
+    let { expert_name, password, repeatpass, expert_class, expert_info, province_ID } = ctx.request.body;
+    if (!expert_name || !password || !repeatpass || !expert_class || !expert_info || !province_ID) {
+        ctx.body = {
+            code: -1,
+            message: '请输入正确的参数'
+        };
+    }
     await userModel.findExpertCountByName(expert_name)
         .then(async (result) => {
-            if(!result){
-                ctx.body = {
-                    code: 500,
-                    message:'请输入参数'
-                };
-            }
+
             if (result[0].count >= 1) {
                 // 用户存在
                 ctx.body = {
-                    code: 500,
+                    code: -1,
                     message: '用户存在'
                 };
             } else if (password !== repeatpass || password.trim() === '') {
                 ctx.body = {
-                    code: 500,
+                    code: -1,
                     message: '两次输入的密码不一致'
                 };
             } else {
@@ -91,7 +92,7 @@ router.post('/expSignup', async (ctx, next) => {
                         console.log('注册成功', res)
                         //注册成功
                         ctx.body = {
-                            code: 200,
+                            code: 1,
                             message: '注册成功'
                         };
                     })
@@ -99,20 +100,21 @@ router.post('/expSignup', async (ctx, next) => {
         })
 })
 // post 创建学校
-router.post('/createSchool', async (ctx, next) => {
+router.post('/school', async (ctx, next) => {
     let { school_name, city_ID } = ctx.request.body
     await userModel.schoolExist(school_name)
         .then(async (result) => {
-            if(!result){
+            if (!result) {
                 ctx.body = {
-                    code: 500,
-                    message:'请输入参数'
+                    code: -1,
+                    message: '请输入参数'
                 };
+                return;
             }
             if (result[0].count >= 1) {
                 // 用户存在
                 ctx.body = {
-                    code: 500,
+                    code: -1,
                     message: '已存在学校'
                 };
             } else {
@@ -120,7 +122,7 @@ router.post('/createSchool', async (ctx, next) => {
                     .then(res => {
                         console.log('注册成功', res)
                         ctx.body = {
-                            code: 200,
+                            code: 1,
                             message: '注册成功'
                         };
                     })
@@ -128,13 +130,119 @@ router.post('/createSchool', async (ctx, next) => {
         })
 })
 
+
+// 获取学校数量
+router.get('/schoolCount', async (ctx, next) => {
+    // await checkNotLogin(ctx)
+    await userModel.returnSchoolCount()
+        .then(async (result) => {
+            ctx.body = {
+                code: 1,
+                data: result
+            };
+        })
+})
+
+// 获取学校列表
+router.get('/school', async (ctx, next) => {
+    // await checkNotLogin(ctx)
+    await userModel.returnSchoolList()
+        .then(async (result) => {
+            ctx.body = {
+                code: 1,
+                data: result
+            };
+        })
+})
+// 删除学校
+router.post('/delSchool', async (ctx, next) => {
+    // await checkNotLogin(ctx)
+    let schoolArr = ctx.request.body;
+    console.log('ctx.request.body:', ctx.request.body);
+    if (!schoolArr) {
+        ctx.body = {
+            code: -1,
+            message: '请输入正确参数',
+        };
+        return;
+    }
+    schoolArr = schoolArr.toString();
+    console.log('schoolArr:', schoolArr);
+    await userModel.deleteSchool(schoolArr)
+        .then(async (result) => {
+            if (result.affectedRows >= 1) {
+                ctx.body = {
+                    code: 1,
+                };
+            } else {
+                ctx.body = {
+                    code: -1,
+                    message: result
+                }
+            }
+
+        })
+})
+// post 创建队伍
+router.post('/team', async (ctx, next) => {
+    let { team_name, school_ID, expert_ID } = ctx.request.body;
+    if (!team_name || !school_ID) {
+        ctx.body = {
+            code: -1,
+            message: '请输入正确参数',
+        };
+        return;
+    }
+    await userModel.teamExist(team_name)
+        .then(async (result) => {
+            if (result[0].count >= 1) {
+                ctx.body = {
+                    code: -1,
+                    message: '已存在队伍'
+                };
+            } else {
+                // if(!expert_ID){
+
+                // }
+                await userModel.createTeam([team_name, school_ID, moment().format('YYYY-MM-DD HH:mm:ss')])
+                    .then(res => {
+                        ctx.body = {
+                            code: 1,
+                            message: '注册成功'
+                        };
+                    })
+            }
+        })
+})
+// 获取队伍数量
+router.get('/teamCount', async (ctx, next) => {
+    // await checkNotLogin(ctx)   
+    await userModel.returnTeamCount()
+        .then(async (result) => {
+            ctx.body = {
+                code: 1,
+                data: result
+            };
+        })
+})
+// 获取队伍列表
+router.get('/team', async (ctx, next) => {
+    // await checkNotLogin(ctx)
+    await userModel.returnTeamList()
+        .then(async (result) => {
+            ctx.body = {
+                code: 1,
+                data: result
+            };
+        })
+})
 // 获取省份列表
 router.get('/getProvince', async (ctx, next) => {
     // await checkNotLogin(ctx)
     await userModel.returnProvinceList()
         .then(async (result) => {
             ctx.body = {
-                code: 200,
+                code: 1,
                 data: result
             };
         })
@@ -147,14 +255,14 @@ router.get('/getCityList', async (ctx, next) => {
         await userModel.returnCityList(province_ID)
             .then(async (result) => {
                 ctx.body = {
-                    code: 200,
+                    code: 1,
                     data: result
                 };
             })
-    }else {
+    } else {
         ctx.body = {
-            code: 500,
-            message:'请输入查询参数'
+            code: -1,
+            message: '请输入查询参数'
         };
     }
 })
