@@ -9,11 +9,17 @@ router.get('/admin/info', async(ctx, next) => {
     await userModel.findAllAdmin()
         .then(result => {
             if (result) {
-                body = {status:1,content:result};
-                console.log('body:',body)
+
+                body = {status:1,content:{
+                    id:result.id,
+                    name:result.name,
+                    moment:result.moment,
+                    avator:result.avator,
+                }};
                 body = JSON.stringify(body);
                 ctx.set("Content-Type", "application/json")
                 ctx.body = body;
+
             }else{
                 ctx.body = {status:-1,message:'no-data-found'}
                 console.log('错误!未找到数据')
