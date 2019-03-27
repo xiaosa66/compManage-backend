@@ -62,8 +62,13 @@ router.post('/signup', async (ctx, next) => {
             }
         })
 })
+
+
+/**************************** 专家相关 ****************************/
+
+
 // post 专家注册
-router.post('/expSignup', async (ctx, next) => {
+router.post('/expert', async (ctx) => {
     let { expert_name, password, repeatpass, expert_class, expert_info, province_ID } = ctx.request.body;
     if (!expert_name || !password || !repeatpass || !expert_class || !expert_info || !province_ID) {
         ctx.body = {
@@ -98,6 +103,64 @@ router.post('/expSignup', async (ctx, next) => {
             }
         })
 })
+
+// 获取专家数量
+router.get('/expertCount', async (ctx) => {
+    await whetherLogin(ctx);
+    await userModel.returnSchoolCount()
+        .then(async (result) => {
+            ctx.body = {
+                code: 1,
+                data: result
+            };
+        })
+})
+
+// 获取专家列表
+router.get('/expert', async (ctx) => {
+    await whetherLogin(ctx);
+    await userModel.returnExpertList()
+        .then(async (result) => {
+            ctx.body = {
+                code: 1,
+                data: result
+            };
+        })
+})
+
+// 删除专家
+router.post('/delExpert', async (ctx, next) => {
+    // await checkNotLogin(ctx)
+    let delArr = ctx.request.body;
+    console.log('ctx.request.body:', ctx.request.body);
+    if (!delArr) {
+        ctx.body = {
+            code: -1,
+            message: '请输入正确参数',
+        };
+        return;
+    }
+    delArr = delArr.toString();
+    console.log('delArr:', delArr);
+    await userModel.deleteExpert(delArr)
+        .then(async (result) => {
+            if (result.affectedRows >= 1) {
+                ctx.body = {
+                    code: 1,
+                };
+            } else {
+                ctx.body = {
+                    code: -1,
+                    message: result
+                }
+            }
+        })
+})
+
+
+/**************************** 学校相关 ****************************/
+
+
 // post 创建学校
 router.post('/school', async (ctx, next) => {
     let { school_name, city_ID } = ctx.request.body
@@ -182,6 +245,10 @@ router.post('/delSchool', async (ctx, next) => {
 
         })
 })
+
+/**************************** 队伍相关 ****************************/
+
+
 // post 创建队伍
 router.post('/team', async (ctx, next) => {
     let { team_name, school_ID, expert_ID } = ctx.request.body;
@@ -235,6 +302,8 @@ router.get('/team', async (ctx, next) => {
             };
         })
 })
+
+/**************************** 省份相关 ****************************/
 // 获取省份列表
 router.get('/getProvince', async (ctx, next) => {
     // await checkNotLogin(ctx)
