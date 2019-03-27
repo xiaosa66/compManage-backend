@@ -335,5 +335,57 @@ router.get('/getCityList', async (ctx, next) => {
     }
 })
 
+/**************************** 新闻相关 ****************************/
+// 新建新闻
+router.post('/posts', async (ctx) => {
+    const { content,name,title } = ctx.request.body;
+       // 获得客户端的Cookie
+       var Cookies = {};
+       ctx.headers.cookie && ctx.headers.cookie.split(';').forEach(function( Cookie ) {
+           var parts = Cookie.split('=');
+           Cookies[ parts[ 0 ].trim() ] = ( parts[ 1 ] || '' ).trim();
+       });
+       console.log('Cookies:',Cookies)
+    if (!content) {
+        ctx.body = {
+            code: -1,
+            message: '请输入正确参数',
+        };
+        return;
+    }
+
+                await userModel.insertPost([name,title,content,Cookies.USER_SID, moment().format('YYYY-MM-DD HH:mm:ss')])
+                    .then(res => {
+                        ctx.body = {
+                            code: 1,
+                            message: '注册成功'
+                        };
+                    })
+            
+        })
+
+// 获取队伍数量
+router.get('/postsCount', async (ctx, next) => {
+    // await checkNotLogin(ctx)   
+    await userModel.returnTeamCount()
+        .then(async (result) => {
+            ctx.body = {
+                code: 1,
+                data: result
+            };
+        })
+})
+// 获取队伍列表
+router.get('/posts', async (ctx, next) => {
+    // await checkNotLogin(ctx)
+    await userModel.findAllPost()
+        .then(async (result) => {
+            ctx.body = {
+                code: 1,
+                data: result
+            };
+        })
+})
+
 
 module.exports = router
