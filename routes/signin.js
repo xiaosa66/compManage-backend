@@ -22,15 +22,14 @@ router.post('/admin/login', async (ctx, next) => {
 
     await userModel.findDataByName(name)
         .then(result => {
-            let res = result
+            let res = result;
+            console.log(res);
             if (name === res[0]['name'] && md5(pass) === res[0]['pass']) {
-
                 ctx.set("Content-Type", "application/json")
                 let post = { status: 1 };
                 ctx.body = JSON.stringify(post);
                 ctx.session.user = res[0]['name']
                 ctx.session.id = res[0]['id']
-                console.log('ctx.session.id', ctx.session.id)
                 console.log('session', ctx.session)
                 console.log('登录成功')
             } else {
